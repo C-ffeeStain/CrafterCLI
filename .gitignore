@@ -1,0 +1,7 @@
+# python folders
+venv/
+dist/
+build/
+
+# settings file
+settings.cfg
