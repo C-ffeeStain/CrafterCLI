@@ -5,3 +5,6 @@ build/
 
 # settings file
 settings.cfg
+
+# .spec files
+*.spec
