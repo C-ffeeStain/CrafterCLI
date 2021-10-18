@@ -5,15 +5,9 @@ import requests
 import toml
 
 from constants import *
-
-
-class UnlockedMaterials(enum.Enum):
-    Grass = 1
-    Beach = 2
-    Desert = 4
-    Mountain = 8
-    Forest = 16
-    River = 32
+from classes import *
+from save_manager import save_game, load_game
+from mod_manager import ModManager
 
 
 raw_link = "https://github.com/C-ffeeStain/CrafterCLI/raw/main/"
@@ -57,15 +51,20 @@ if not os.path.exists("settings.cfg"):
         toml.dump(settings, f)
 
 recipes = {
-    "Grass": {"dirt", "water"},
-    "Beach": {"sand", "water"},
-    "Desert": {"sand", "rock"},
-    "Mountain": {"rock", "rock"},
-    "Forest": {"wood", "grass"},
-    "River": {"water", "rock"},
+    "grass": {"dirt", "water"},
+    "beach": {"sand", "water"},
+    "desert": {"sand", "stone"},
+    "mountain": {"stone", "stone"},
+    "forest": {"wood", "grass"},
+    "river": {"water", "stone"},
+    "oasis": {"desert", "water"},
 }
 
-materials = ["water", "dirt", "sand", "stone", "ore", "seed"]
+materials = ["water", "dirt", "sand", "stone", "ore", "seed", "wood"]
+
+unlocked_items = load_game()
+if not unlocked_items:
+    unlocked_items = []
 
 if __name__ == "__main__":
     print("Type 'materials' for a list of unlocked materials.")
@@ -74,6 +73,8 @@ if __name__ == "__main__":
     )
     print("Example: craft sand,water")
     print("To exit, type 'exit'.")
+
+    modman = ModManager()
     while True:
         instruction = input(">> ")
         split_instruction = instruction.split()
@@ -86,10 +87,12 @@ if __name__ == "__main__":
                 print(material)
         elif command == "craft":
             typed_materials = instruction.removeprefix(command + " ").split(",")
-            for key, value in recipes.items():
+            for key, value in list(recipes.items()) + list(unlocked_items):
                 if value == set(typed_materials):
-                    print(key)
+                    print(f"You unlocked {key}!")
+                    unlocked_items.append(key)
         elif command == "exit":
+            save_game(unlocked_items)
             break
         else:
             print("Unknown command:", command)

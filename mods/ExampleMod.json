@@ -1,0 +1,23 @@
+{
+    "meta": {
+        "name": "ExampleMod",
+        "version": "1.0.0",
+        "author": "ExampleAuthor",
+        "description": "Example mod description"
+    },
+    "items": [
+        {
+            "name": "example material",
+            "unlockable": false
+        },
+        {
+            "name": "example item",
+            "unlockable": true,
+            "unlocked": false,
+            "crafting_recipe": [
+                "example material",
+                "water"
+            ]
+        }
+    ]
+}
