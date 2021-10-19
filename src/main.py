@@ -65,31 +65,43 @@ if settings["password"] != "":
         else:
             incorrect_password = False
 
-# with open(PATH / "VERSION", "r") as f:
-#     version = f.read().splitlines()[0]
-#     online_version = requests.get(raw_link + "VERSION").text.splitlines()[0]
-#     if (
-#         version != online_version
-#         and not version.endswith("-beta")
-#         and settings["auto-update"]
-#     ):
-#         print("New version:", online_version)
-#         if settings["auto_update"]:
-#             print("Updating...")
-#             releases = requests.get(releases_link)
-#             for release in releases.json():
-#                 print("Online version:", online_version)
-#                 print("Release:", release["tag_name"].strip())
-#                 if release["tag_name"] == online_version:
-#                     print("Downloading...")
-#                     os.rename(__file__, "Crafter.backup.exe")
-#                     r = requests.get(
-#                         release["assets"][0]["browser-download-url"],
-#                         allow_redirects=True,
-#                     )
+if settings["auto-update"]:
+    print("Checking for updates...")
+    try:
+        if getattr(sys, "frozen", False):
+            with open(os.path.join(sys._MEIPASS, "VERSION"), "r") as f:
+                current_version = f.read().strip()
+        else:
+            with open("VERSION", "r") as f:
+                current_version = f.read().strip()
+        response = requests.get(releases_link)
+        if response.status_code == 200:
+            file_path = Path(__file__)
+            os.rename(__file__, file_path.stem + ".backup." + file_path.suffix)
 
-#                     print("Done!")
-#             sys.exit(1)
+            releases = response.json()
+            latest_release = releases[0]
+            latest_version = latest_release["tag_name"]
+            if latest_version != current_version:
+                print(
+                    f"A new version of CrafterCLI is available: {latest_version}."
+                    f"\nDownloading..."
+                )
+                response = requests.get(
+                    "https://github.com/C-ffeeStain/CrafterCLI/releases/download/0.1.6/Crafter.exe",
+                    allow_redirects=True,
+                )
+                if response.status_code == 200:
+                    with open("Crafter.exe", "wb") as f:
+                        f.write(response.content)
+                    print("Download complete.")
+                    sys.exit()
+                else:
+                    print("Failed to download new version.")
+                    sys.exit()
+    except Exception as e:
+        print(f"Failed to check for updates: {e}")
+        sys.exit()
 
 
 recipes = {
