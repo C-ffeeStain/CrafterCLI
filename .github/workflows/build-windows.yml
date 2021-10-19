@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -35,11 +35,10 @@ jobs:
           # The target architecture (x86, x64) of the Python interpreter.
           architecture: x64
       
-      - name: Install PyInstaller
-        run: py -m pip install pyinstaller
-              
-      - name: Run PyInstaller
-        run: pyinstaller --onefile --add-data VERSION;. src\main.py
+      - name: Package Application
+        uses: JackMcKew/pyinstaller-action-windows@main
+        with:
+          path: src
       
       - name: Move Built Files
         run: move dist\main.exe Crafter.exe
