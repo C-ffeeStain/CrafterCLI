@@ -13,4 +13,6 @@ if getattr(sys, "frozen", False):
     PATH = Path(sys._MEIPASS)
 else:
     PATH = Path(os.path.dirname(os.path.abspath(__file__))).parent
-    print(PATH)
+
+if not DATA_DIR.exists():
+    os.mkdir(str(DATA_DIR))
