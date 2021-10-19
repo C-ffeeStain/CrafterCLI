@@ -19,8 +19,8 @@ class ModManager:
         self.load_enabled_mods()
 
     @staticmethod
-    def get_mod_list():
-        """Returns a list of all the mods enabled and disabled."""
+    def add_new_mods():
+        """Adds new mods to the enabled.json file."""
         with open("mods/enabled.json", "r") as mod_file:
             data = json.load(mod_file)
             mod_list = data["enabled"] + data["disabled"]
@@ -31,22 +31,32 @@ class ModManager:
         with open("mods/enabled.json", "w") as mod_file:
             json.dump(data, mod_file, indent=4)
 
-    def add_new_mods(self):
-        """Adds new mods to the enabled.json file."""
+    @staticmethod
+    def get_mod_list():
+        """Returns a list of all the mods enabled and disabled."""
         with open("mods/enabled.json", "r") as mod_file:
             data = json.load(mod_file)
             enabled_mods = data["enabled"]
-            for mod in enabled_mods:
-                self.load_mod(mod)
+            disabled_mods = data["disabled"]
+        return {"enabled": enabled_mods, "disabled": disabled_mods}
+
+    def apply_loaded_mods(self, materials: list, recipes: dict[str, set[str]]):
+        """Applies all loaded mods to the game."""
+        for mod in self.loaded_mods:
+            for item in mod["items"]:
+                if not item["unlockable"]:
+                    materials.append(item["name"])
+                elif not item["unlocked"] and item["unlockable"]:
+                    recipes[item["name"]] = set(item["crafting_recipe"])
+                elif item["unlocked"] and item["unlockable"]:
+                    recipes[item["name"]] = set(item["crafting_recipe"])
+                    materials.append(item["name"])
+        return materials, recipes
 
     def load_enabled_mods(self):
         enabled_mods = ModManager.get_mod_list()["enabled"]
         for mod in enabled_mods:
             self.load_mod(mod)
-
-    def create_mod_guid(self, meta):
-        """Creates a GUID for a mod in the format of `author.modname`."""
-        return f"{meta['author'].lower().replace(' ', '_')}.{meta['name'].lower().replace(' ', '_')}"
 
     def load_mod(self, name) -> bool:
         """Loads a mod. Returns true if the mod was loaded successfully."""
@@ -60,11 +70,11 @@ class ModManager:
             print(f"Mod '{name}' is missing its metadata.")
             return False
         for mod in self.loaded_mods:
-            if mod == self.create_mod_guid(meta):
+            if mod == mod_data:
                 print(f"Mod '{name}' is already loaded.")
                 return False
 
-        self.loaded_mods.append(self.create_mod_guid(meta))
+        self.loaded_mods.append(mod_data)
         print(f"Loaded mod '{name}' by {meta['author']}.")
         return True
 
