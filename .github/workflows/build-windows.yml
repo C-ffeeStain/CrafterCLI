@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build Windows Release
 
 # Controls when the workflow will run
 on:
@@ -24,6 +24,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+              fetch-depth: 1
       
       - name: Setup Python
         uses: actions/setup-python@v2.2.2
@@ -32,6 +34,7 @@ jobs:
           python-version: "3.9.5"
           # The target architecture (x86, x64) of the Python interpreter.
           architecture: x64
+      
       - name: Install PyInstaller
         run: py -m pip install pyinstaller
               
@@ -39,7 +42,7 @@ jobs:
         run: pyinstaller --onefile --add-data VERSION;. src\main.py
       
       - name: Move Built Files
-      - run: move dist\main.exe Crafter.exe
+        run: move dist\main.exe Crafter.exe
       
       - name: Publish New Unstable
         uses: marvinpinto/action-automatic-releases@v1.1.0
