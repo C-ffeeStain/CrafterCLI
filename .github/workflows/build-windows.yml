@@ -41,7 +41,7 @@ jobs:
           path: src
       
       - name: Move Built Files
-        run: mv dist/main.exe Crafter.exe
+        run: mv dist/Crafter.exe Crafter.exe
       
       - name: Publish New Unstable
         uses: marvinpinto/action-automatic-releases@v1.1.0
