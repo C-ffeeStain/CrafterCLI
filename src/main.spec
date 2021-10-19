@@ -4,9 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\c_ffeestain\\Python\\Crafter'],
+             pathex=[],
              binaries=[],
-             datas=["VERSION", "."],
+             datas=[("VERSION", ".")],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
